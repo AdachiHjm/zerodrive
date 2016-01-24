@@ -1,5 +1,6 @@
 package zerodrive.util.logging;
 
+import java.text.MessageFormat;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -81,6 +82,12 @@ public class Logger {
     }
 
     private String buildMsg(String msg, Object firstParam, Object... remainingParams) {
-        // FIXME: パラメータとメッセージを合成して出力する文字列を作成する
+        Object[] arguments = new Object[remainingParams.length + 1];
+        arguments[0] = firstParam;
+        for (int i = 0, length = remainingParams.length; i < length; i++) {
+            arguments[i + 1] = remainingParams[i];
+        }
+
+        return MessageFormat.format(msg, arguments);
     }
 }
