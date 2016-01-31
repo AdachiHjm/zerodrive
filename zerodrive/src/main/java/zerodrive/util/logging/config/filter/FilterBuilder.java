@@ -8,7 +8,7 @@ import zerodrive.util.logging.config.AbstractBuilder;
 
 
 /**
- * {@linkplain java.util.logging.Filter} を構築するビルダクラスです。
+ * {@linkplain java.util.logging.Filter} を構築する {@linkplain AbstractBuilder} のサブクラスです。
  * 
  * @author AdachiHjm
  * @created 2016/01/31 23:26:45
@@ -16,11 +16,7 @@ import zerodrive.util.logging.config.AbstractBuilder;
  */
 public class FilterBuilder extends AbstractBuilder<Filter> {
     //======================================================================
-    // Fields
-
-
-    //======================================================================
-    // Methods
+    // Constructors
     public FilterBuilder (String className) {
         super(className);
     }

@@ -1,4 +1,4 @@
-package zerodrive.util.logging;
+package zerodrive.util.logging.filter;
 
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
