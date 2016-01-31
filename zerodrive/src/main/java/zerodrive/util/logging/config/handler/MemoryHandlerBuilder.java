@@ -1,4 +1,4 @@
-package zerodrive.util.logging.builder;
+package zerodrive.util.logging.config.handler;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -23,7 +23,7 @@ public class MemoryHandlerBuilder extends HandlerBuilder {
 
     //======================================================================
     // Fields
-    private final Set<String> ignoreNameSet = new HashSet<>();
+    private final Set<String> constructorArgs = new HashSet<>();
 
 
     //======================================================================
@@ -31,16 +31,16 @@ public class MemoryHandlerBuilder extends HandlerBuilder {
     public MemoryHandlerBuilder(String name, String type, HandlerBuilderContainer container) {
         super(name, type, container);
 
-        this.ignoreNameSet.add(PROPERTY_TARGET);
-        this.ignoreNameSet.add(PROPERTY_SIZE);
-        this.ignoreNameSet.add(PROPERTY_PUSH);
+        this.constructorArgs.add(PROPERTY_TARGET);
+        this.constructorArgs.add(PROPERTY_SIZE);
+        this.constructorArgs.add(PROPERTY_PUSH);
     }
 
 
     //======================================================================
     // Methods
     /**
-     * @see zerodrive.util.logging.builder.HandlerBuilder#build()
+     * @see zerodrive.util.logging.config.handler.HandlerBuilder#build()
      */
     @Override
     public Handler build() {
@@ -52,9 +52,10 @@ public class MemoryHandlerBuilder extends HandlerBuilder {
                     this.getPropertyAsLevel(PROPERTY_PUSH, Level.SEVERE));
             handler.setEncoding(this.getEncoding());
             handler.setLevel(this.getLevel());
+            handler.setFilter(this.getFilter());
 
             this.getPropertyNames().stream()
-                .filter(name -> !this.ignoreNameSet.contains(name))
+                .filter(name -> !this.constructorArgs.contains(name))
                 .forEach(name -> {
                     try {
                         PropertyDescriptor desc = new PropertyDescriptor(name, MemoryHandler.class);

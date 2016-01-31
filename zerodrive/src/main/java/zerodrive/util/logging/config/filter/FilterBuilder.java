@@ -1,35 +1,37 @@
-package zerodrive.util.logging.builder;
+package zerodrive.util.logging.config.filter;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.util.logging.Handler;
+import java.util.logging.Filter;
+
+import zerodrive.util.logging.config.AbstractBuilder;
 
 
 /**
- * {@linkplain HandlerBuilder} のデフォルト実装です。
+ * {@linkplain java.util.logging.Filter} を構築するビルダクラスです。
  * 
  * @author AdachiHjm
- * @created 2016/01/31 1:04:57
+ * @created 2016/01/31 23:26:45
  *
  */
-public class DefaultHandlerBuilder extends HandlerBuilder {
+public class FilterBuilder extends AbstractBuilder<Filter> {
+    //======================================================================
+    // Fields
+
 
     //======================================================================
-    // Constructors
-    public DefaultHandlerBuilder(String name, String type, HandlerBuilderContainer container) {
-        super(name, type, container);
+    // Methods
+    public FilterBuilder (String className) {
+        super(className);
     }
 
 
     //======================================================================
     // Methods
-    @Override
-    public Handler build() {
+    public Filter build() {
         try {
-            final Class<? extends Handler> cls = Class.forName(this.getType()).asSubclass(Handler.class);
-            final Handler handler = cls.newInstance();
-            handler.setEncoding(this.getEncoding());
-            handler.setLevel(this.getLevel());
+            final Class<? extends Filter> cls = Class.forName(this.getClassName()).asSubclass(Filter.class);
+            final Filter filter = cls.newInstance();
 
             this.getPropertyNames().forEach(name -> {
                 try {
@@ -38,7 +40,7 @@ public class DefaultHandlerBuilder extends HandlerBuilder {
                     if (null != setter) {
                         Class<?>[] types = setter.getParameterTypes();
                         if (1 == types.length) {
-                            setter.invoke(handler, this.getPropertyAs(name, types[0]));
+                            setter.invoke(filter, this.getPropertyAs(name, types[0]));
                         }
                     }
                 } catch (Exception ignore) {
@@ -46,11 +48,9 @@ public class DefaultHandlerBuilder extends HandlerBuilder {
                 }
             });
             
-            return handler;
+            return filter;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
-
 }
