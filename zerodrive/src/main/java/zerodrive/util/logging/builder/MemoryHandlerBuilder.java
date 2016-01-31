@@ -2,7 +2,6 @@ package zerodrive.util.logging.builder;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Handler;
