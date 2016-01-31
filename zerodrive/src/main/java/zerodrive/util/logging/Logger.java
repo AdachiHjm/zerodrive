@@ -2,6 +2,7 @@ package zerodrive.util.logging;
 
 import java.text.MessageFormat;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 
@@ -11,6 +12,8 @@ import java.util.logging.LogRecord;
  *
  */
 public class Logger {
+    //======================================================================
+    // Fields
     private final java.util.logging.Logger origin;
 
 

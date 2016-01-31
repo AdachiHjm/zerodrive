@@ -1,0 +1,49 @@
+<!ENTITY % Boolean "(true|false)">
+<!ENTITY % ClassName "CDATA">
+<!ENTITY % Integer "CDATA">
+
+<!ELEMENT logging (handler+, logger+, root?)>
+
+<!ELEMENT handler (property*, filter*, formatter?)>
+<!ATTLIST handler
+    name     ID          #REQUIRED
+    class    %ClassName; #REQUIRED
+    encoding CDATA       #IMPLIED
+    level    CDATA       #IMPLIED
+    builder  %ClassName; #IMPLIED
+>
+
+<!ELEMENT filter (property*)>
+<!ATTLIST filter
+    class %ClassName; #REQUIRED
+>
+
+<!ELEMENT formatter (property*)>
+<!ATTLIST formatter
+    class %ClassName; #REQUIRED
+>
+
+<!ELEMENT logger (handler-ref+)>
+<!ATTLIST logger
+    name       CDATA #REQUIRED
+    additivity %Boolean; #REQUIRED
+    level      CDATA #IMPLIED
+    resource   CDATA #IMPLIED
+>
+
+<!ELEMENT root (handler-ref+)>
+<!ATTLIST root
+    level    CDATA #REQUIRED
+    resource CDATA #IMPLIED
+>
+
+<!ELEMENT handler-ref EMPTY>
+<!ATTLIST handler-ref
+    ref IDREF #REQUIRED
+>
+
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+    name    CDATA #REQUIRED
+    value   CDATA #REQUIRED
+>
