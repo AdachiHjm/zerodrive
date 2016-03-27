@@ -6,7 +6,7 @@ public class Level extends java.util.logging.Level {
 
     private static final String DEFAULT_BUNDLE_NAME = "zerodrive.util.logging.zerodrive-logging";
 
-    public Level(String name, int value, String resourceBundleName) {
+    protected Level(String name, int value, String resourceBundleName) {
         super(name, value, resourceBundleName);
     }
 

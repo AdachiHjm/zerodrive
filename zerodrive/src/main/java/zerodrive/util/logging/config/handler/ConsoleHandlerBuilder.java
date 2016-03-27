@@ -1,10 +1,7 @@
 package zerodrive.util.logging.config.handler;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
-import java.util.logging.MemoryHandler;
 
 
 /**
@@ -15,11 +12,17 @@ import java.util.logging.MemoryHandler;
  *
  */
 public class ConsoleHandlerBuilder extends HandlerBuilder {
+    //======================================================================
+    // Constants
     private final String PROPERTY_OUTPUT = "output";
 
-    public ConsoleHandlerBuilder(String name, String type, HandlerBuilderContainer container) {
-        super(name, type, container);
+
+    //======================================================================
+    // Constructors
+    public ConsoleHandlerBuilder(String name, String className, String encoding, String level, HandlerFactory factory) {
+        super(name, className, encoding, level, factory);
     }
+
 
     /**
      * @see zerodrive.util.logging.config.handler.HandlerBuilder#build()
@@ -49,24 +52,7 @@ public class ConsoleHandlerBuilder extends HandlerBuilder {
             handler.setLevel(this.getLevel());
             handler.setFilter(this.getFilter());
 
-            this.getPropertyNames().stream()
-            .filter(name -> !PROPERTY_OUTPUT.equals(name))
-            .forEach(name -> {
-                try {
-                    PropertyDescriptor desc = new PropertyDescriptor(name, MemoryHandler.class);
-                    Method setter = desc.getWriteMethod();
-                    if (null != setter) {
-                        Class<?>[] types = setter.getParameterTypes();
-                        if (1 == types.length) {
-                            setter.invoke(handler, this.getPropertyAs(name, types[0]));
-                        }
-                    }
-                } catch (Exception ignore) {
-                    // Ignore.
-                }
-            });
-
-            return handler;
+            return this.setProperties(ConsoleHandler.class, handler, PROPERTY_OUTPUT);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,12 +1,7 @@
 package zerodrive.util.logging.config.handler;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
-import java.util.logging.MemoryHandler;
 
 
 /**
@@ -17,31 +12,27 @@ import java.util.logging.MemoryHandler;
  *
  */
 public class FileHandlerBuilder extends HandlerBuilder {
-    private static final String PROPERTY_LIMIT = "limit";
-    private static final String PROPERTY_COUNT = "count";
-    private static final String PROPERTY_PATTERN = "pattern";
-    private static final String PROPERTY_APPEND = "append";
+    //======================================================================
+    // Constants
+    private static final String INITARG_LIMIT = "limit";
+    private static final String INITARG_COUNT = "count";
+    private static final String INITARG_PATTERN = "pattern";
+    private static final String INITARG_APPEND = "append";
     private static final String DEFAULT_PATTERN = "%h/java%u.log";
     private static final int DEFAULT_COUNT = 1;
     private static final int DEFAULT_LIMIT = 0;
     private static final boolean DEFAULT_APPEND = false;
 
-    //======================================================================
-    // Fields
-    private final Set<String> constructorArgs = new HashSet<>();
-
 
     //======================================================================
     // Constructors
-    public FileHandlerBuilder(String name, String type, HandlerBuilderContainer container) {
-        super(name, type, container);
-
-        this.constructorArgs.add(PROPERTY_LIMIT);
-        this.constructorArgs.add(PROPERTY_COUNT);
-        this.constructorArgs.add(PROPERTY_PATTERN);
-        this.constructorArgs.add(PROPERTY_APPEND);
+    public FileHandlerBuilder(String name, String className, String encoding, String level, HandlerFactory factory) {
+        super(name, className, encoding, level, factory);
     }
 
+
+    //======================================================================
+    // Methods
     /**
      * @see zerodrive.util.logging.config.handler.HandlerBuilder#build()
      */
@@ -50,32 +41,15 @@ public class FileHandlerBuilder extends HandlerBuilder {
         try {
             final FileHandler handler =
                 new FileHandler(
-                    this.getPropertyAs(PROPERTY_PATTERN, String.class, DEFAULT_PATTERN),
-                    this.getPropertyAs(PROPERTY_LIMIT, Integer.class, DEFAULT_LIMIT),
-                    this.getPropertyAs(PROPERTY_COUNT, Integer.class, DEFAULT_COUNT),
-                    this.getPropertyAs(PROPERTY_APPEND, Boolean.class, DEFAULT_APPEND));
+                    this.getPropertyAs(INITARG_PATTERN, String.class, DEFAULT_PATTERN),
+                    this.getPropertyAs(INITARG_LIMIT, Integer.class, DEFAULT_LIMIT),
+                    this.getPropertyAs(INITARG_COUNT, Integer.class, DEFAULT_COUNT),
+                    this.getPropertyAs(INITARG_APPEND, Boolean.class, DEFAULT_APPEND));
             handler.setEncoding(this.getEncoding());
             handler.setLevel(this.getLevel());
             handler.setFilter(this.getFilter());
 
-            this.getPropertyNames().stream()
-                .filter(name -> !this.constructorArgs.contains(name))
-                .forEach(name -> {
-                    try {
-                        PropertyDescriptor desc = new PropertyDescriptor(name, MemoryHandler.class);
-                        Method setter = desc.getWriteMethod();
-                        if (null != setter) {
-                            Class<?>[] types = setter.getParameterTypes();
-                            if (1 == types.length) {
-                                setter.invoke(handler, this.getPropertyAs(name, types[0]));
-                            }
-                        }
-                    } catch (Exception ignore) {
-                        // Ignore.
-                    }
-                });
-
-            return handler;
+            return this.setProperties(FileHandler.class, handler, INITARG_PATTERN, INITARG_LIMIT, INITARG_COUNT, INITARG_APPEND);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

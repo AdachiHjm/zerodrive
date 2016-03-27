@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<!DOCTYPE logging SYSTEM "file:///C:/Users/AdachiHjm/git/zerodrive/zerodrive/src/main/resources/logging_1_0.dtd">
+<!DOCTYPE logging SYSTEM "file:///C:/Users/AdachiHjm/git/zerodrive/zerodrive/src/main/resources/zerodrive/util/logging/logging_1_0.dtd">
 
 <logging>
     <handler name="STDOUT" class="java.util.logging.ConsoleHandler">

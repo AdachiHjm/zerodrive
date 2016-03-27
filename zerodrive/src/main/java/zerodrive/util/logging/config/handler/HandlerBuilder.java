@@ -2,17 +2,17 @@ package zerodrive.util.logging.config.handler;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
 import zerodrive.util.logging.config.AbstractBuilder;
+import zerodrive.util.reflect.converter.TypeConverter;
 
 
 /**
- * {@linkplain java.util.logging.Handler} を構築する {@linkplain AbstractBuilder} のサブクラスです。
+ * Handler を構築する {@link AbstractBuilder} のサブクラスです。
  * 
  * @author AdachiHjm
  * @created 2016/01/31 0:24:28
@@ -24,27 +24,33 @@ public class HandlerBuilder extends AbstractBuilder<Handler> {
 
     //======================================================================
     // Fields
-    private final HandlerBuilderContainer container;
+    private final HandlerFactory factory;
     private final String name;
-    private final Map<String, String> attributes = new HashMap<>();
+    private final String encoding;
+    private final Level level;
     private Filter filter;
 
 
     //======================================================================
     // Constructors
-    protected HandlerBuilder(String _name, String _className, HandlerBuilderContainer _container) {
+    protected HandlerBuilder(String _name, String _className, String _encoding, String _level, HandlerFactory _factory) {
         super(_className);
 
-        this.name = _name;
-        this.container = _container;
-        if (null == this.name) {
-            throw new IllegalStateException("'name' must not be null.");
+        if (null == _name) {
+            throw new IllegalStateException("Argument '_name' must not be null.");
         }
-        if (null == this.container) {
-            throw new IllegalStateException("'container' must not be null.");
+        if (null == _factory) {
+            throw new IllegalStateException("Argument '_factory' must not be null.");
         }
 
-        this.container.add(this);
+        this.name = _name;
+        this.encoding = _encoding;
+        this.level = null != _level ? Level.parse(_level) : null;
+        this.factory = _factory;
+
+        this.factory.add(this);
+
+        this.addConverter(Level.class, new LevelConverter());
     }
 
 
@@ -62,50 +68,31 @@ public class HandlerBuilder extends AbstractBuilder<Handler> {
             handler.setLevel(this.getLevel());
             handler.setFilter(this.getFilter());
 
-            this.getPropertyNames().forEach(name -> {
-                try {
-                    PropertyDescriptor desc = new PropertyDescriptor(name, cls);
-                    Method setter = desc.getWriteMethod();
-                    if (null != setter) {
-                        Class<?>[] types = setter.getParameterTypes();
-                        if (1 == types.length) {
-                            setter.invoke(handler, this.getPropertyAs(name, types[0]));
-                        }
-                    }
-                } catch (Exception ignore) {
-                    // Ignore.
-                }
-            });
-            
-            return handler;
+            return this.setProperties(cls, handler);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void addAttribute(String name, String value) {
-        this.attributes.put(name, value);
     }
 
     /**
      * @return encoding name or null
      */
     protected String getEncoding() {
-        return this.attributes.get(ATTR_ENCODING);
+        return this.encoding;
     }
 
     /**
      * @return message level
      */
     protected Level getLevel() {
-        return this.attributes.containsKey(ATTR_LEVEL) ? Level.parse(this.attributes.get(ATTR_LEVEL)) : null;
+        return this.level;
     }
 
-    protected Handler getPropertyAsHandler(String _name) {
+    protected Handler getPropertyAs(String _name) {
         if (this.getName().equals(_name)) {
             throw new IllegalArgumentException("Handler name " + _name + " is itself.");
         }
-        return this.container.getHandler(_name);
+        return this.factory.getHandler(_name);
     }
 
     protected Level getPropertyAsLevel(String _name) {
@@ -114,6 +101,26 @@ public class HandlerBuilder extends AbstractBuilder<Handler> {
 
     protected Level getPropertyAsLevel(String _name, Level defaultLevel) {
         return this.getProperties().containsKey(_name) ? Level.parse(this.getProperties().get(_name)) : defaultLevel;
+    }
+
+    protected Handler setProperties(final Class<? extends Handler> cls, final Handler handler, String... ignoreFieldNames) {
+        this.getPropertyNames().stream()
+        .filter(name -> !Arrays.asList(ignoreFieldNames).contains(name))
+        .forEach(name -> {
+            try {
+                PropertyDescriptor desc = new PropertyDescriptor(name, cls);
+                Method setter = desc.getWriteMethod();
+                if (null != setter) {
+                    Class<?>[] types = setter.getParameterTypes();
+                    if (1 == types.length) {
+                        setter.invoke(handler, this.getPropertyAs(name, types[0]));
+                    }
+                }
+            } catch (Exception ignore) {
+                // Ignore.
+            }
+        });
+        return handler;
     }
 
 
@@ -135,5 +142,12 @@ public class HandlerBuilder extends AbstractBuilder<Handler> {
     // Setters
     public void setFilter(Filter filter) {
         this.filter = filter;
+    }
+
+    private static class LevelConverter implements TypeConverter<Level> {
+        @Override
+        public Level convert(String level) {
+            return null != level ? Level.parse(level) : Level.ALL;
+        }
     }
 }

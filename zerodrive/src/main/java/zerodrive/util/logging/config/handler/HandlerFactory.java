@@ -10,7 +10,7 @@ import java.util.logging.Handler;
  * @created 2016/01/31 0:36:38
  *
  */
-public class HandlerBuilderContainer {
+public class HandlerFactory {
     //======================================================================
     // Fields
     private final Map<String, Handler> handlers = new HashMap<>();
@@ -19,7 +19,7 @@ public class HandlerBuilderContainer {
 
     //======================================================================
     // Methods
-    public void add(HandlerBuilder builder) {
+    void add(HandlerBuilder builder) {
         if (null == builder) {
             throw new NullPointerException("Argument 'builder' must not be null.");
         }

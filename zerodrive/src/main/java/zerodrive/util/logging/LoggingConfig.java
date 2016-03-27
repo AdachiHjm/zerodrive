@@ -2,8 +2,13 @@ package zerodrive.util.logging;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.net.URL;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.MemoryHandler;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -14,6 +19,13 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
+
+import zerodrive.util.logging.config.filter.FilterBuilder;
+import zerodrive.util.logging.config.handler.ConsoleHandlerBuilder;
+import zerodrive.util.logging.config.handler.FileHandlerBuilder;
+import zerodrive.util.logging.config.handler.HandlerBuilder;
+import zerodrive.util.logging.config.handler.HandlerFactory;
+import zerodrive.util.logging.config.handler.MemoryHandlerBuilder;
 
 /**
  * @author AdachiHjm
@@ -70,6 +82,13 @@ public class LoggingConfig {
 
 
     private static class LoggingConfigHandler extends DefaultHandler {
+        private final Map<String, Class<? extends HandlerBuilder>> builderMap = new HashMap<>();
+        private LoggingConfigHandler() {
+            this.builderMap.put(ConsoleHandler.class.getName(), ConsoleHandlerBuilder.class);
+            this.builderMap.put(FileHandler.class.getName(), FileHandlerBuilder.class);
+            this.builderMap.put(MemoryHandler.class.getName(), MemoryHandlerBuilder.class);
+        }
+
         private static class Element {
             private static final String LOGGING = "logging";
             private static final String HANDLER = "handler";
@@ -81,31 +100,52 @@ public class LoggingConfig {
             private static final String PROPERTY = "property";
         }
 
+        private final HandlerFactory factory = new HandlerFactory();
+        private HandlerBuilder handlerBuilder;
+        private FilterBuilder filterBuilder;
+
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes)
                 throws SAXException {
+            try {
+                switch (qName) {
+                case Element.LOGGING:
+                    // do nothing.
+                    break;
+                case Element.HANDLER:
+                    String handlerName = attributes.getValue("name");
+                    String handlerClassName = attributes.getValue("class");
+                    String encoding = attributes.getValue("encoding");
+                    String level = attributes.getValue("level");
+                    String builderClassName = attributes.getValue("builder");
 
-            switch (qName) {
-            case Element.LOGGING:
-                // do nothing.
-                break;
-            case Element.HANDLER:
-                break;
-            case Element.FILTER:
-                break;
-            case Element.FORMATTER:
-                break;
-            case Element.LOGGER:
-                break;
-            case Element.ROOT:
-                break;
-            case Element.HANDLER_REF:
-                break;
-            case Element.PROPERTY:
-                break;
-            default:
-                // do nothing.
-                break;
+                    Class<? extends HandlerBuilder> builderClass;
+                    if (null != builderClassName) {
+                        builderClass = Class.forName(builderClassName).asSubclass(HandlerBuilder.class);
+                    } else {
+                        builderClass = (this.builderMap.containsKey(handlerClassName)) ? this.builderMap.get(handlerClassName) : HandlerBuilder.class;
+                    }
+                    Constructor<? extends HandlerBuilder> constructor = builderClass.getConstructor(String.class, String.class, String.class, String.class, HandlerFactory.class);
+                    this.handlerBuilder = constructor.newInstance(handlerName, handlerClassName, encoding, level, this.factory);
+                    break;
+                case Element.FILTER:
+                    break;
+                case Element.FORMATTER:
+                    break;
+                case Element.LOGGER:
+                    break;
+                case Element.ROOT:
+                    break;
+                case Element.HANDLER_REF:
+                    break;
+                case Element.PROPERTY:
+                    break;
+                default:
+                    // do nothing.
+                    break;
+                }
+            } catch (Exception e) {
+                throw new SAXException(e);
             }
 
 

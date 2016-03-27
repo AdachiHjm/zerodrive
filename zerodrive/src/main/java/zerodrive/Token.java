@@ -38,6 +38,8 @@ public class Token extends Observable implements Serializable {
 
     //======================================================================
     // Fields
+    // FIXME: 辿ってきた節点をスタック(Deque)に保持する。分岐した場合は、分岐元が辿った履歴を継承する。
+
     private final String id;
 
 	private final Token parent;

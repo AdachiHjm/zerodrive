@@ -1,9 +1,5 @@
 package zerodrive.util.logging.config.handler;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.MemoryHandler;
@@ -17,23 +13,17 @@ import java.util.logging.MemoryHandler;
  *
  */
 public class MemoryHandlerBuilder extends HandlerBuilder {
-    private static final String PROPERTY_TARGET = "target";
-    private static final String PROPERTY_SIZE = "size";
-    private static final String PROPERTY_PUSH = "push";
-
     //======================================================================
-    // Fields
-    private final Set<String> constructorArgs = new HashSet<>();
+    // Constatns
+    private static final String INITARG_TARGET = "target";
+    private static final String INITARG_SIZE = "size";
+    private static final String INITARG_PUSH = "push";
 
 
     //======================================================================
     // Constructors
-    public MemoryHandlerBuilder(String name, String type, HandlerBuilderContainer container) {
-        super(name, type, container);
-
-        this.constructorArgs.add(PROPERTY_TARGET);
-        this.constructorArgs.add(PROPERTY_SIZE);
-        this.constructorArgs.add(PROPERTY_PUSH);
+    public MemoryHandlerBuilder(String name, String type, String encoding, String level, HandlerFactory container) {
+        super(name, type, encoding, level, container);
     }
 
 
@@ -47,31 +37,14 @@ public class MemoryHandlerBuilder extends HandlerBuilder {
         try {
             final MemoryHandler handler =
                 new MemoryHandler(
-                    this.getPropertyAsHandler(PROPERTY_TARGET),
-                    this.getPropertyAs(PROPERTY_SIZE, Integer.class, 1000),
-                    this.getPropertyAsLevel(PROPERTY_PUSH, Level.SEVERE));
+                    this.getPropertyAs(INITARG_TARGET),
+                    this.getPropertyAs(INITARG_SIZE, Integer.class, 1000),
+                    this.getPropertyAsLevel(INITARG_PUSH, Level.SEVERE));
             handler.setEncoding(this.getEncoding());
             handler.setLevel(this.getLevel());
             handler.setFilter(this.getFilter());
 
-            this.getPropertyNames().stream()
-                .filter(name -> !this.constructorArgs.contains(name))
-                .forEach(name -> {
-                    try {
-                        PropertyDescriptor desc = new PropertyDescriptor(name, MemoryHandler.class);
-                        Method setter = desc.getWriteMethod();
-                        if (null != setter) {
-                            Class<?>[] types = setter.getParameterTypes();
-                            if (1 == types.length) {
-                                setter.invoke(handler, this.getPropertyAs(name, types[0]));
-                            }
-                        }
-                    } catch (Exception ignore) {
-                        // Ignore.
-                    }
-                });
-
-            return handler;
+            return this.setProperties(MemoryHandler.class, handler, INITARG_TARGET, INITARG_SIZE, INITARG_PUSH);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
