@@ -18,12 +18,14 @@
 
 <!ELEMENT filter (property*)>
 <!ATTLIST filter
-    class %ClassName; #REQUIRED
+    class   %ClassName; #REQUIRED
+    builder %ClassName; #IMPLIED
 >
 
 <!ELEMENT formatter (property*)>
 <!ATTLIST formatter
-    class %ClassName; #REQUIRED
+    class   %ClassName; #REQUIRED
+    builder %ClassName; #IMPLIED
 >
 
 <!ELEMENT logger (handler-ref+)>

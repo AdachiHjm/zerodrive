@@ -2,7 +2,6 @@ package zerodrive.util.logging;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +19,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
+import zerodrive.util.logging.config.element.FilterElement;
+import zerodrive.util.logging.config.element.HandlerElement;
+import zerodrive.util.logging.config.element.LoggingElement;
 import zerodrive.util.logging.config.filter.FilterBuilder;
 import zerodrive.util.logging.config.handler.ConsoleHandlerBuilder;
 import zerodrive.util.logging.config.handler.FileHandlerBuilder;
@@ -27,19 +29,21 @@ import zerodrive.util.logging.config.handler.HandlerBuilder;
 import zerodrive.util.logging.config.handler.HandlerFactory;
 import zerodrive.util.logging.config.handler.MemoryHandlerBuilder;
 
+
 /**
  * @author AdachiHjm
  * @created 2015/12/01 23:21:05
  *
  */
 public abstract class LoggingConfig {
-    private static final String DEFAULT_CONFIG_NAME = "logging.xml";
+    private static final String CONFIG = "logging.xml";
+    private static final String DEFAULT_CONFIG = "zerodrive/util/logging/logging.xml";
 
 
     //======================================================================
     // Consutrucors
     public static void configure() {
-        configure(DEFAULT_CONFIG_NAME);
+        configure(CONFIG);
     }
 
     public static void configure(String resourceName) {
@@ -102,6 +106,7 @@ public abstract class LoggingConfig {
         }
 
         private final HandlerFactory factory = new HandlerFactory();
+        private String loggingName;
         private HandlerBuilder handlerBuilder;
         private FilterBuilder filterBuilder;
 
@@ -111,25 +116,13 @@ public abstract class LoggingConfig {
             try {
                 switch (qName) {
                 case Element.LOGGING:
-                    // do nothing.
+                    this.loggingName = new LoggingElement(attributes).getName();
                     break;
                 case Element.HANDLER:
-                    String handlerName = attributes.getValue("name");
-                    String handlerClassName = attributes.getValue("class");
-                    String encoding = attributes.getValue("encoding");
-                    String level = attributes.getValue("level");
-                    String builderClassName = attributes.getValue("builder");
-
-                    Class<? extends HandlerBuilder> builderClass;
-                    if (null != builderClassName) {
-                        builderClass = Class.forName(builderClassName).asSubclass(HandlerBuilder.class);
-                    } else {
-                        builderClass = (this.builderMap.containsKey(handlerClassName)) ? this.builderMap.get(handlerClassName) : HandlerBuilder.class;
-                    }
-                    Constructor<? extends HandlerBuilder> constructor = builderClass.getConstructor(String.class, String.class, String.class, String.class, HandlerFactory.class);
-                    this.handlerBuilder = constructor.newInstance(handlerName, handlerClassName, encoding, level, this.factory);
+                    this.handlerBuilder = new HandlerElement(attributes).getHandlerBuilder(this.factory);
                     break;
                 case Element.FILTER:
+                    this.filterBuilder = new FilterElement(attributes).getFilterBuilder();
                     break;
                 case Element.FORMATTER:
                     break;
@@ -171,4 +164,5 @@ public abstract class LoggingConfig {
             }
         }
     }
+
 }
