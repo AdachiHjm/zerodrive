@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE logging SYSTEM "file:///C:/Users/AdachiHjm/git/zerodrive/src/main/resources/zerodrive/util/logging/logging_1_0.dtd">
+
+<logging name="ZeroDrive">
+    <handler name="STDOUT" class="java.util.logging.ConsoleHandler">
+        <property name="output" value="stdout"/>
+        <filter class="zerodrive.util.logging.RegexFilter">
+            <property name="pattern" value="^[0-9].+$"/>
+        </filter>
+        <formatter class="java.util.logging.SimpleFormatter">
+        </formatter>
+    </handler>
+
+    <logger name="zerodrive" additivity="false" level="INFO">
+        <handler-ref ref="STDOUT" />
+    </logger>
+
+    <root level="INFO">
+        <handler-ref ref="STDOUT" />
+    </root>
+</logging>
