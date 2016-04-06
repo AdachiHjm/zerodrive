@@ -9,11 +9,11 @@ import java.util.logging.MemoryHandler;
 
 import org.xml.sax.Attributes;
 
-import zerodrive.util.logging.config.handler.ConsoleHandlerBuilder;
-import zerodrive.util.logging.config.handler.FileHandlerBuilder;
-import zerodrive.util.logging.config.handler.HandlerBuilder;
-import zerodrive.util.logging.config.handler.HandlerFactory;
-import zerodrive.util.logging.config.handler.MemoryHandlerBuilder;
+import zerodrive.util.logging.config.builder.handler.ConsoleHandlerBuilder;
+import zerodrive.util.logging.config.builder.handler.FileHandlerBuilder;
+import zerodrive.util.logging.config.builder.handler.HandlerBuilder;
+import zerodrive.util.logging.config.builder.handler.HandlerFactory;
+import zerodrive.util.logging.config.builder.handler.MemoryHandlerBuilder;
 
 
 public class HandlerElement {

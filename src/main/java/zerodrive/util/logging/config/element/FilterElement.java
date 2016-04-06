@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.xml.sax.Attributes;
 
-import zerodrive.util.logging.config.filter.FilterBuilder;
-import zerodrive.util.logging.config.handler.HandlerBuilder;
+import zerodrive.util.logging.config.builder.filter.FilterBuilder;
+import zerodrive.util.logging.config.builder.handler.HandlerBuilder;
 
 
 public class FilterElement {

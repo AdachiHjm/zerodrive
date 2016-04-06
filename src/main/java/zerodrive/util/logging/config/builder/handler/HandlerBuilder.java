@@ -5,7 +5,7 @@ import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
-import zerodrive.util.logging.config.AbstractBuilder;
+import zerodrive.util.logging.config.builder.AbstractBuilder;
 import zerodrive.util.reflect.ObjectBuilder;
 import zerodrive.util.reflect.converter.TypeConverter;
 

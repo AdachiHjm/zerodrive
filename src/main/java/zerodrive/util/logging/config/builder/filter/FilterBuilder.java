@@ -3,7 +3,7 @@ package zerodrive.util.logging.config.builder.filter;
 import java.util.Map;
 import java.util.logging.Filter;
 
-import zerodrive.util.logging.config.AbstractBuilder;
+import zerodrive.util.logging.config.builder.AbstractBuilder;
 import zerodrive.util.reflect.ObjectBuilder;
 
 
