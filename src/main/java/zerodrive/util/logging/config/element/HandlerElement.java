@@ -36,7 +36,7 @@ public class HandlerElement {
     }
 
     public HandlerBuilder getHandlerBuilder(final HandlerFactory factory) throws Exception {
-        Class<? extends HandlerBuilder> builderClass;
+        final Class<? extends HandlerBuilder> builderClass;
         if (null != this.builder) {
             builderClass = Class.forName(this.builder).asSubclass(HandlerBuilder.class);
         } else {

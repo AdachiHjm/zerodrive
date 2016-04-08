@@ -1,8 +1,10 @@
 package zerodrive.util.logging.config.element;
 
+import java.lang.reflect.Constructor;
+
 import org.xml.sax.Attributes;
 
-import zerodrive.util.logging.config.builder.filter.FilterBuilder;
+import zerodrive.util.logging.config.builder.formatter.FormatterBuilder;
 
 
 public class FormatterElement {
@@ -14,7 +16,9 @@ public class FormatterElement {
         this.builder = attributes.getValue(AttrNames.BUILDER);
     }
 
-    public FilterBuilder getFilterBuilder() throws ClassNotFoundException {
-        return new FilterBuilder(this.type);
+    public FormatterBuilder getFormatterBuilder() throws Exception {
+        final Class<? extends FormatterBuilder> builderClass = (null != this.builder) ? Class.forName(this.builder).asSubclass(FormatterBuilder.class) : FormatterBuilder.class;
+        final Constructor<? extends FormatterBuilder> constructor = builderClass.getConstructor(String.class);
+        return constructor.newInstance(this.type);
     }
 }
