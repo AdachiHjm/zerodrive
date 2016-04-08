@@ -18,7 +18,8 @@ import zerodrive.util.reflect.ObjectBuilder;
 public class MemoryHandlerBuilder extends HandlerBuilder {
     //======================================================================
     // Constructors
-    public MemoryHandlerBuilder(String name, String encoding, String level, HandlerFactory container) {
+    public MemoryHandlerBuilder(String name, String encoding, String level, HandlerFactory container)
+            throws ClassNotFoundException {
         super(name, MemoryHandler.class.getName(), encoding, level, container);
     }
 

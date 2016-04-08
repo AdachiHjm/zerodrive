@@ -1,23 +1,21 @@
 package zerodrive.util.logging.config.builder.handler;
 
-import java.util.Map;
 import java.util.logging.Filter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
-import zerodrive.util.logging.config.builder.AbstractBuilder;
-import zerodrive.util.reflect.ObjectBuilder;
+import zerodrive.util.logging.config.builder.BaseBuilder;
 import zerodrive.util.reflect.converter.TypeConverter;
 
 
 /**
- * Handler を構築する {@link AbstractBuilder} のサブクラスです。
+ * Handler を構築する {@link BaseBuilder} のサブクラスです。
  * 
  * @author AdachiHjm
  * @created 2016/01/31 0:24:28
  *
  */
-public class HandlerBuilder extends AbstractBuilder<Handler> {
+public class HandlerBuilder extends BaseBuilder<Handler> {
     //======================================================================
     // Fields
     private final HandlerFactory factory;
@@ -26,7 +24,8 @@ public class HandlerBuilder extends AbstractBuilder<Handler> {
 
     //======================================================================
     // Constructors
-    protected HandlerBuilder(String _name, String _className, String _encoding, String _level, HandlerFactory _factory) {
+    protected HandlerBuilder(String _name, String _className, String _encoding, String _level, HandlerFactory _factory)
+            throws ClassNotFoundException {
         super(_className);
         this.addConverter(Level.class, new LevelConverter());
 
@@ -48,25 +47,6 @@ public class HandlerBuilder extends AbstractBuilder<Handler> {
 
     //======================================================================
     // Methods
-    /**
-     * @return java.util.logging.Handler instance.
-     */
-    @Override
-    public Handler build() {
-        try {
-            final Class<? extends Handler> type = Class.forName(this.getClassName()).asSubclass(Handler.class);
-            final ObjectBuilder<? extends Handler> builder = new ObjectBuilder<>(type);
-
-            for (Map.Entry<String, Object> entry : this.getProperties().entrySet()) {
-                builder.addProperty(entry.getKey(), entry.getValue());
-            }
-
-            return builder.build();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     protected Handler getPropertyAs(String _name) {
         if (this.getName().equals(_name)) {
             throw new IllegalArgumentException("Handler name " + _name + " is itself.");

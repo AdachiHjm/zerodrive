@@ -29,7 +29,8 @@ public class FileHandlerBuilder extends HandlerBuilder {
 
     //======================================================================
     // Constructors
-    public FileHandlerBuilder(String name, String encoding, String level, HandlerFactory factory) {
+    public FileHandlerBuilder(String name, String encoding, String level, HandlerFactory factory)
+            throws ClassNotFoundException {
         super(name, FileHandler.class.getName(), encoding, level, factory);
     }
 

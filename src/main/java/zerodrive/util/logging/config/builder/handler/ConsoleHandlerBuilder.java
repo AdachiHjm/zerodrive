@@ -17,7 +17,8 @@ import zerodrive.util.reflect.ObjectBuilder;
 public class ConsoleHandlerBuilder extends HandlerBuilder {
     //======================================================================
     // Constructors
-    public ConsoleHandlerBuilder(String name, String encoding, String level, HandlerFactory factory) {
+    public ConsoleHandlerBuilder(String name, String encoding, String level, HandlerFactory factory)
+            throws ClassNotFoundException {
         super(name, ConsoleHandler.class.getName(), encoding, level, factory);
     }
 

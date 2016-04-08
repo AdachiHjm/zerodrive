@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import zerodrive.util.reflect.ObjectBuilder;
 import zerodrive.util.reflect.converter.ByteConverter;
 import zerodrive.util.reflect.converter.DoubleConverter;
 import zerodrive.util.reflect.converter.FloatConverter;
@@ -20,21 +21,23 @@ import zerodrive.util.reflect.converter.TypeConverter;
  * @created 2016/01/31 23:49:25
  *
  */
-public abstract class AbstractBuilder<C> {
+public abstract class BaseBuilder<C> {
     //======================================================================
     // Fields
     private final Map<Class<?>, TypeConverter<?>> converters = new HashMap<>();
     private final Map<String, Object> properties = new HashMap<>();
-    private final String className;
+    private final Class<C> type;
 
 
     //======================================================================
     // Constructors
-    protected AbstractBuilder(String _className) {
-        this.className = _className;
-        if (null == this.className) {
-            throw new IllegalStateException("'className' must not be null.");
-        }
+    @SuppressWarnings("unchecked")
+    protected BaseBuilder(String className) throws ClassNotFoundException {
+        this((Class<C>) Class.forName(className));
+    }
+
+    protected BaseBuilder(Class<C> _type) {
+        this.type = _type;
 
         this.converters.put(Byte.class, new ByteConverter());
         this.converters.put(Double.class, new DoubleConverter());
@@ -48,7 +51,19 @@ public abstract class AbstractBuilder<C> {
 
     //======================================================================
     // Methods
-    public abstract C build();
+    public C build() {
+        try {
+            final ObjectBuilder<C> builder = new ObjectBuilder<>(this.getType());
+
+            for (Map.Entry<String, Object> entry : this.getProperties().entrySet()) {
+                builder.addProperty(entry.getKey(), entry.getValue());
+            }
+
+            return builder.build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public <T> void addProperty(Class<T> type, String name, String value) {
         this.properties.put(name, this.convert(type, value));
@@ -81,46 +96,14 @@ public abstract class AbstractBuilder<C> {
         return (null != value) ? value : defaultValue;
     }
 
-//    protected <T> T getPropertyAs(String _name, Class<T> type) {
-//        return this.getPropertyAs(_name, type, null);
-//    }
-//
-//    protected <T> T getPropertyAs(String _name, Class<T> type, T defaultValue) {
-//        return this.converters.containsKey(type) ? type.cast(this.converters.get(type).convert(this.properties.get(_name))) : defaultValue;
-//    }
-//
-//    protected <R> R setProperties(final Class<R> cls, final R obj, String... ignoreProperties) {
-//        return this.setProperties(cls, cls, obj, ignoreProperties);
-//    }
-//
-//    protected <R> R setProperties(final Class<R> resultType, final Class<?> cls, final Object obj, String... ignoreProperties) {
-//        this.getPropertyNames().stream()
-//        .filter(name -> !Arrays.asList(ignoreProperties).contains(name))
-//        .forEach(name -> {
-//            try {
-//                PropertyDescriptor desc = new PropertyDescriptor(name, cls);
-//                Method setter = desc.getWriteMethod();
-//                if (null != setter) {
-//                    Class<?>[] types = setter.getParameterTypes();
-//                    if (1 == types.length) {
-//                        setter.invoke(obj, this.getPropertyAs(name, types[0]));
-//                    }
-//                }
-//            } catch (Exception ignore) {
-//                // Ignore.
-//            }
-//        });
-//        return resultType.cast(obj);
-//    }
-
     private <V> V convert(Class<V> type, String value) {
         return type.cast(this.converters.get(type).convert(value));
     }
 
     //======================================================================
     // Getters
-    protected String getClassName() {
-        return this.className;
+    protected Class<C> getType() {
+        return this.type;
     }
 
     protected Map<String, Object> getProperties() {

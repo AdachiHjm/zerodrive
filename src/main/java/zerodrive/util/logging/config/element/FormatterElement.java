@@ -14,7 +14,7 @@ public class FormatterElement {
         this.builder = attributes.getValue(AttrNames.BUILDER);
     }
 
-    public FilterBuilder getFilterBuilder() {
+    public FilterBuilder getFilterBuilder() throws ClassNotFoundException {
         return new FilterBuilder(this.type);
     }
 }
