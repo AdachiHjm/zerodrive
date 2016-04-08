@@ -1,10 +1,6 @@
 package zerodrive.util.logging.config.builder.handler;
 
-import java.util.Map;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-
-import zerodrive.util.reflect.ObjectBuilder;
 
 
 /**
@@ -20,25 +16,6 @@ public class ConsoleHandlerBuilder extends HandlerBuilder {
     public ConsoleHandlerBuilder(String name, String encoding, String level, HandlerFactory factory)
             throws ClassNotFoundException {
         super(name, ConsoleHandler.class.getName(), encoding, level, factory);
-    }
-
-
-    /**
-     * @see zerodrive.util.logging.config.handler.HandlerBuilder#build()
-     */
-    @Override
-    public Handler build() {
-        try {
-            final ObjectBuilder<ConsoleHandler> builder = new ObjectBuilder<>(ConsoleHandler.class);
-
-            for (Map.Entry<String, Object> entry : this.getProperties().entrySet()) {
-                builder.addProperty(entry.getKey(), entry.getValue());
-            }
-
-            return builder.build();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

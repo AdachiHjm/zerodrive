@@ -1,4 +1,4 @@
-package zerodrive.util.logging.config.builder.filter;
+package zerodrive.util.logging.config.builder.formatter;
 
 import java.util.logging.Filter;
 
@@ -12,10 +12,10 @@ import zerodrive.util.logging.config.builder.BaseBuilder;
  * @created 2016/01/31 23:26:45
  *
  */
-public class FilterBuilder extends BaseBuilder<Filter> {
+public class FormatterBuilder extends BaseBuilder<Filter> {
     //======================================================================
     // Constructors
-    public FilterBuilder (String className) throws ClassNotFoundException {
+    public FormatterBuilder (String className) throws ClassNotFoundException {
         super(className);
     }
 }
